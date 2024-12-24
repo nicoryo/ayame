@@ -17,6 +17,8 @@
   - @voluntas
 - [ADD] リリースバイナリに linux arm64 を追加する
   - @voluntas
+- [CHANGE] debug 設定が有効な場合にのみ、signaling.log に受信したシグナリングの生データを出力するように変更する
+  - @Hexa
 
 ## 2023.2.0
 
