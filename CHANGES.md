@@ -17,6 +17,8 @@
   - @voluntas
 - [ADD] リリースバイナリに linux arm64 を追加する
   - @voluntas
+- [CHANGE] debug 設定が有効な場合にのみ、signaling.log に受信したシグナリングの生データを出力するように変更する
+  - @Hexa
 - [ADD] シグナリングで任意のメッセージの送信を有効にする type_message 設定を追加する
   - デフォルト値: false（type: message 無効）
   - @Hexa
