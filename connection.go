@@ -400,6 +400,19 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			return errRegistrationIncomplete
 		}
 		c.forward(rawMessage)
+	case "message":
+		// 設定が有効でなければ default と同じ処理
+		if !c.config.TypeMessage {
+			c.errLog().Msg("InvalidMessageType")
+			return errInvalidMessageType
+		}
+
+		// register が完了していない
+		if !c.registered {
+			c.errLog().Msg("RegistrationIncomplete")
+			return errRegistrationIncomplete
+		}
+		c.forward(rawMessage)
 	case "connected":
 		// register が完了していない
 		if !c.registered {
