@@ -25,7 +25,7 @@
 
 - [UPDATE] CI の staticcheck を 2024.1.1 に上げる
   - @voluntas
-- [UPDATE] go.mod のGo 1.23.4 に上げる
+- [UPDATE] go.mod の Go 1.23.4 に上げる
   - @voluntas
 - [ADD] リリースバイナリに linux arm64 を追加する
   - @voluntas
