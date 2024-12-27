@@ -38,10 +38,6 @@ func (s *Server) signalingHandler(c echo.Context) error {
 	}
 
 	wsConn.SetReadLimit(readLimit)
-	if err != nil {
-		zlog.Debug().Err(err).Send()
-		return err
-	}
 
 	// ここで connectionId みたいなの作るべき
 	connection := connection{

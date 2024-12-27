@@ -29,6 +29,8 @@ type Config struct {
 	LogLevel         string `ini:"log_level"`
 	SignalingLogName string `ini:"signaling_log_name"`
 
+	TypeMessage bool `ini:"type_message"`
+
 	ListenIPv4Address string `ini:"listen_ipv4_address"`
 	ListenPortNumber  int32  `ini:"listen_port_number"`
 

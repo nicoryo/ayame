@@ -11,6 +11,25 @@
 
 ## develop
 
+## 2024.1.0
+
+- [CHANGE] debug 設定が有効な場合にのみ、signaling.log に受信したシグナリングの生データを出力するように変更する
+  - @Hexa
+- [ADD] シグナリングで任意のメッセージの送信を有効にする type_message 設定を追加する
+  - デフォルト値: false（type: message 無効）
+  - @Hexa
+- [ADD] シグナリングで任意のメッセージの送信時に指定する type: message を追加する
+  - @Hexa
+
+### misc
+
+- [UPDATE] CI の staticcheck を 2024.1.1 に上げる
+  - @voluntas
+- [UPDATE] go.mod の Go 1.23.4 に上げる
+  - @voluntas
+- [ADD] リリースバイナリに linux arm64 を追加する
+  - @voluntas
+
 ## 2023.2.0
 
 - [CHANGE] websocket を公式に戻す
