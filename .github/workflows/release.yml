@@ -8,10 +8,10 @@ jobs:
     name: release
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
-      - uses: actions/checkout@v4
       - name: Set version
         id: version
         run: |
