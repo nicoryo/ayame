@@ -11,6 +11,15 @@
 
 ## develop
 
+### misc
+
+- [UPDATE] CI の dominikh/staticcheck-action を v1 固定する
+  - @voluntas
+- [UPDATE] CI の staticcheck を 2025.1.1 に上げる
+  - @voluntas
+- [UPDATE] go.mod の Go 1.24.1 に上げる
+  - @voluntas
+
 ## 2024.1.0
 
 - [CHANGE] debug 設定が有効な場合にのみ、signaling.log に受信したシグナリングの生データを出力するように変更する
