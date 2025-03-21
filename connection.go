@@ -47,15 +47,6 @@ type connection struct {
 	metrics *Metrics
 }
 
-const (
-	// socket の待ち受け時間
-	readTimeout = 90
-	// pong が送られてこないためタイムアウトにするまでの時間
-	pongTimeout = 60
-	// ping 送信の時間間隔
-	pingInterval = 5
-)
-
 func (c *connection) SendJSON(v interface{}) error {
 	if err := c.wsConn.WriteJSON(v); err != nil {
 		c.errLog().Err(err).Interface("msg", v).Msg("FailedToSendMsg")
@@ -158,8 +149,8 @@ func (c *connection) forward(msg []byte) {
 }
 
 func (c *connection) main(cancel context.CancelFunc, messageChannel chan []byte) {
-	pongTimeoutTimer := time.NewTimer(pongTimeout * time.Second)
-	pingTimer := time.NewTimer(pingInterval * time.Second)
+	pongTimeoutTimer := time.NewTimer(time.Duration(c.config.WebSocketPongTimeoutSec) * time.Second)
+	pingTimer := time.NewTimer(time.Duration(c.config.WebSocketPingIntervalSec) * time.Second)
 
 	defer func() {
 		timerStop(pongTimeoutTimer)
@@ -182,7 +173,7 @@ loop:
 					break loop
 				}
 			}
-			pingTimer.Reset(pingInterval * time.Second)
+			pingTimer.Reset(time.Duration(c.config.WebSocketPingIntervalSec) * time.Second)
 		case <-pongTimeoutTimer.C:
 			if !c.standalone {
 				// タイマーが発火してしまったので切断する
@@ -235,7 +226,7 @@ loop:
 func (c *connection) wsRecv(ctx context.Context, messageChannel chan []byte) {
 loop:
 	for {
-		readDeadline := time.Now().Add(time.Duration(readTimeout) * time.Second)
+		readDeadline := time.Now().Add(time.Duration(c.config.WebSocketReadTimeoutSec) * time.Second)
 		if err := c.wsConn.SetReadDeadline(readDeadline); err != nil {
 			c.errLog().Err(err).Msg("FailedSetReadDeadLine")
 			break loop
@@ -283,7 +274,7 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 	switch message.Type {
 	case "pong":
 		timerStop(pongTimeoutTimer)
-		pongTimeoutTimer.Reset(pongTimeout * time.Second)
+		pongTimeoutTimer.Reset(time.Duration(c.config.WebSocketPongTimeoutSec) * time.Second)
 	case "register":
 		// すでに登録されているのにもう一度登録しに来た
 		if c.registered {
