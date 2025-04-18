@@ -28,10 +28,15 @@ const (
 )
 
 type Config struct {
-	Debug            bool   `ini:"debug"`
-	LogDir           string `ini:"log_dir"`
-	LogName          string `ini:"log_name"`
-	LogLevel         string `ini:"log_level"`
+	Debug bool `ini:"debug"`
+
+	LogDir   string `ini:"log_dir"`
+	LogName  string `ini:"log_name"`
+	LogLevel string `ini:"log_level"`
+
+	ConsoleLogJSON  bool `ini:"console_log_json"`
+	ConsoleLogColor bool `ini:"console_log_color"`
+
 	SignalingLogName string `ini:"signaling_log_name"`
 
 	TypeMessage bool `ini:"type_message"`
