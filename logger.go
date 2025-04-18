@@ -26,15 +26,16 @@ func InitLogger(config *Config) error {
 
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 
-	logLevel, err := parseLevel(*config)
-	if err != nil {
-		return err
+	if config.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
 	if config.Debug && config.DebugConsoleLog {
 		// デバッグコンソールを JSON 形式で出力
 		if config.DebugConsoleLogJSON {
-			log.Logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger().Level(logLevel)
+			log.Logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 			return nil
 		}
 
@@ -48,13 +49,13 @@ func InitLogger(config *Config) error {
 			NoColor: false,
 		}
 		prettyFormat(&writer)
-		log.Logger = zerolog.New(writer).With().Caller().Timestamp().Logger().Level(logLevel)
+		log.Logger = zerolog.New(writer).With().Caller().Timestamp().Logger()
 
 		return nil
 	}
 
 	if config.LogStdout {
-		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger().Level(logLevel)
+		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 		return nil
 	}
 
@@ -65,7 +66,7 @@ func InitLogger(config *Config) error {
 		MaxAge:     config.LogRotateMaxAge,
 		Compress:   config.LogRotateCompress,
 	}
-	log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
+	log.Logger = zerolog.New(writer).With().Timestamp().Logger()
 
 	return nil
 }
@@ -116,24 +117,4 @@ func prettyFormat(w *zerolog.ConsoleWriter) {
 	w.FormatFieldValue = func(i interface{}) string {
 		return fmt.Sprintf("%s", i)
 	}
-}
-
-func parseLevel(config Config) (zerolog.Level, error) {
-	// debug: true の場合の log_level は debug で固定
-	if config.Debug {
-		return zerolog.DebugLevel, nil
-	}
-
-	// 空文字列は NoLevel 扱いで ParseLevel でエラーにならないため事前に確認する
-	if config.LogLevel == "" {
-		return zerolog.NoLevel, errConfigInvalidLogLevel
-	}
-
-	logLevel, err := zerolog.ParseLevel(config.LogLevel)
-	if err != nil {
-		// err は継続するように読めるのでここで捨てる
-		return logLevel, errConfigInvalidLogLevel
-	}
-
-	return logLevel, nil
 }

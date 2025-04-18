@@ -37,7 +37,6 @@ type Config struct {
 
 	LogDir              string `ini:"log_dir"`
 	LogName             string `ini:"log_name"`
-	LogLevel            string `ini:"log_level"`
 	LogStdout           bool   `ini:"log_stdout"`
 	LogRotateMaxSize    int    `ini:"log_rotate_max_size"`
 	LogRotateMaxBackups int    `ini:"log_rotate_max_backups"`
@@ -148,7 +147,6 @@ func (c *Config) PrintConfig() {
 
 	zlog.Info().Str("log_dir", c.LogDir).Msg("AyameConf")
 	zlog.Info().Str("log_name", c.LogName).Msg("AyameConf")
-	zlog.Info().Str("log_level", c.LogLevel).Msg("AyameConf")
 	zlog.Info().Bool("log_stdout", c.LogStdout).Msg("AyameConf")
 
 	zlog.Info().Int("log_rotate_max_size", c.LogRotateMaxSize).Msg("AyameConf")
