@@ -32,6 +32,8 @@
   - `debug` が `true` かつ `debug_console_log` が `true` の場合のみ有効
   - `log_stdout` が無効化される
   - @voluntas
+- [FIX] WebSocket 確立後にメッセージが送られてきたタイミングで connectionId を生成するように修正する
+  - @voluntas
 
 ## 2025.2.0
 
