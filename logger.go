@@ -47,15 +47,20 @@ func InitLogger(config *Config) error {
 	if err != nil {
 		return err
 	}
-
-	// デバッグが有効な時はコンソールにもだす
-	if config.Debug {
-		var writers io.Writer
-		stdout := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: "2006-01-02 15:04:05.000000Z"}
+	// ayame.log のファイル出力は JSON Lines 形式のみ
+	if config.Debug && config.ConsoleLogJSON {
+		// デバッグが有効かつ JSON Lines 形式で出力する場合
+		writers := io.MultiWriter(os.Stdout, writer)
+		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
+	} else if config.Debug {
+		// デバッグが有効
+		// わかりにくいが NoColor なので !config.ConsoleLogColor となる
+		stdout := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: !config.ConsoleLogColor, TimeFormat: "2006-01-02 15:04:05.000000Z"}
 		prettyFormat(&stdout)
-		writers = io.MultiWriter(stdout, writer)
+		writers := io.MultiWriter(stdout, writer)
 		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
 	} else {
+		// デバッグが無効な場合はファイル出力のみ
 		log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
 	}
 

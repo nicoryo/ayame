@@ -11,6 +11,19 @@
 
 ## develop
 
+## 2025.2.0
+
+- [ADD] コンソールログを JSONL 形式で出力できるようにする
+  - 設定ファイルに `console_log_json` を追加
+  - デフォルト false
+  - @voluntas
+- [ADD] コンソールログのカラー有効化を指定できるようにする
+  - 設定ファイルに `console_log_color` を追加
+  - デフォルト true
+  - @voluntas
+
+## 2025.1.0
+
 - [CHANGE] ayame.log を JSONL 形式で出力するようにする
   - @voluntas
 - [CHANGE] シグナリングで利用する WebSocket の設定を定数から設定できるように変更する
