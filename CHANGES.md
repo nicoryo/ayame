@@ -13,6 +13,11 @@
 
 - [CHANGE] ayame.log は JSONL 形式で出力するようにする
   - @voluntas
+- [CHANGE] シグナリングで利用する WebSocket の設定を定数から設定できるように変更する
+  - WebSocket の待ち受け時間を設定する `websocket_read_timeout_sec` を追加
+  - WebSocket の Pong が送られてこないためタイムアウトにするまでの時間を設定する `websocket_pong_timeout_sec` を追加
+  - WebSocket の Ping 送信の時間間隔を設定する `websocket_ping_interval_sec` を追加
+  - @voluntas
 
 ### misc
 

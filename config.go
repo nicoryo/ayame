@@ -12,9 +12,14 @@ import (
 var Version string
 
 const (
-	defaultLogDir                = "."
-	defaultLogName               = "ayame.log"
-	defaultSignalingLogName      = "signaling.log"
+	defaultLogDir           = "."
+	defaultLogName          = "ayame.log"
+	defaultSignalingLogName = "signaling.log"
+
+	defaultWebSocketReadTimeoutSec  = 90
+	defaultWebSocketPongTimeoutSec  = 60
+	defaultWebSocketPingIntervalSec = 5
+
 	defaultWebhookLogName        = "webhook.log"
 	defaultWebhookRequestTimeout = 5
 
@@ -33,6 +38,13 @@ type Config struct {
 
 	ListenIPv4Address string `ini:"listen_ipv4_address"`
 	ListenPortNumber  int32  `ini:"listen_port_number"`
+
+	// socket の待ち受け時間
+	WebSocketReadTimeoutSec int32 `ini:"websocket_read_timeout_sec"`
+	// pong が送られてこないためタイムアウトにするまでの時間
+	WebSocketPongTimeoutSec int32 `ini:"websocket_pong_timeout_sec"`
+	// ping 送信の時間間隔
+	WebSocketPingIntervalSec int32 `ini:"websocket_ping_interval_sec"`
 
 	AuthnWebhookURL      string `ini:"authn_webhook_url"`
 	DisconnectWebhookURL string `ini:"disconnect_webhook_url"`
@@ -84,6 +96,18 @@ func setDefaultsConfig(config *Config) {
 
 	if config.SignalingLogName == "" {
 		config.SignalingLogName = defaultSignalingLogName
+	}
+
+	if config.WebSocketReadTimeoutSec == 0 {
+		config.WebSocketReadTimeoutSec = defaultWebSocketReadTimeoutSec
+	}
+
+	if config.WebSocketPongTimeoutSec == 0 {
+		config.WebSocketPongTimeoutSec = defaultWebSocketPongTimeoutSec
+	}
+
+	if config.WebSocketPingIntervalSec == 0 {
+		config.WebSocketPingIntervalSec = defaultWebSocketPingIntervalSec
 	}
 
 	if config.WebhookLogName == "" {
