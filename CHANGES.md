@@ -11,6 +11,9 @@
 
 ## develop
 
+- [CHANGE] ayame.log は JSONL 形式で出力するようにする
+  - @voluntas
+
 ### misc
 
 - [UPDATE] CI の dominikh/staticcheck-action を v1 固定する
