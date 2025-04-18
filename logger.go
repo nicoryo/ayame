@@ -95,11 +95,10 @@ func prettyFormat(w *zerolog.ConsoleWriter) {
 	//       2023-04-17 12:50:09.334758Z [INFO] [config.go:102] CONF | debug=true
 	// TODO: name=value が無い場合に | を消す方法がわからなかった
 	w.FormatMessage = func(i interface{}) string {
-		if i == nil {
+		if i == nil || i == "" {
 			return ""
-		} else {
-			return fmt.Sprintf("%s |", i)
 		}
+		return fmt.Sprintf("%s |", i)
 	}
 	w.FormatFieldName = func(i interface{}) string {
 		const Cyan = "\x1b[36m"
