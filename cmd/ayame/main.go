@@ -35,6 +35,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	config.PrintConfig()
+
 	server, err := ayame.NewServer(config)
 	if err != nil {
 		log.Fatal(err)

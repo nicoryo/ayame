@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -42,35 +43,69 @@ func InitLogger(config *Config) error {
 
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 
-	var writers io.Writer
-	output := zerolog.ConsoleWriter{Out: writer, NoColor: true, TimeFormat: "2006-01-02 15:04:05.000000Z"}
-	format(&output)
-	// デバッグが有効な時はコンソールにもだす
-	if config.Debug {
-		stdout := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "2006-01-02 15:04:05.000000Z"}
-		format(&stdout)
-		writers = io.MultiWriter(stdout, output)
-	} else {
-		writers = output
-	}
-
 	logLevel, err := parseLevel(*config)
 	if err != nil {
 		return err
 	}
 
-	log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
+	// デバッグが有効な時はコンソールにもだす
+	if config.Debug {
+		var writers io.Writer
+		stdout := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: "2006-01-02 15:04:05.000000Z"}
+		prettyFormat(&stdout)
+		writers = io.MultiWriter(stdout, writer)
+		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
+	} else {
+		log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
+	}
 
 	return nil
 }
 
-func format(w *zerolog.ConsoleWriter) {
+// 現時点での prettyFormat
+// 2023-04-17 12:51:56.333485Z [INFO] config.go:102 > CONF | debug=true
+func prettyFormat(w *zerolog.ConsoleWriter) {
+	const Reset = "\x1b[0m"
+
 	w.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("[%s]", i))
+		var color, level string
+		// TODO: 各色を定数に置き換える
+		// TODO: 他の logLevel が必要な場合は追加する
+		switch i.(string) {
+		case "info":
+			color = "\x1b[32m"
+		case "error":
+			color = "\x1b[31m"
+		case "warn":
+			color = "\x1b[33m"
+		case "debug":
+			color = "\x1b[34m"
+		default:
+			color = "\x1b[37m"
+		}
+
+		level = strings.ToUpper(i.(string))
+		return fmt.Sprintf("%s[%s]%s", color, level, Reset)
+	}
+	w.FormatCaller = func(i interface{}) string {
+		return fmt.Sprintf("[%s]", filepath.Base(i.(string)))
+	}
+	// TODO: Caller をファイル名と行番号だけの表示で出力する
+	//       以下のようなフォーマットにしたい
+	//       2023-04-17 12:50:09.334758Z [INFO] [config.go:102] CONF | debug=true
+	// TODO: name=value が無い場合に | を消す方法がわからなかった
+	w.FormatMessage = func(i interface{}) string {
+		if i == nil {
+			return ""
+		} else {
+			return fmt.Sprintf("%s |", i)
+		}
 	}
 	w.FormatFieldName = func(i interface{}) string {
-		return fmt.Sprintf("%s=", i)
+		const Cyan = "\x1b[36m"
+		return fmt.Sprintf("%s%s=%s", Cyan, i, Reset)
 	}
+	// TODO: カンマ区切りを同実現するかわからなかった
 	w.FormatFieldValue = func(i interface{}) string {
 		return fmt.Sprintf("%s", i)
 	}
