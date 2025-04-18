@@ -8,16 +8,13 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func InitLogger(config *Config) error {
+func InitLogger(config *Config, logFilename string, logType string) (*zerolog.Logger, error) {
 	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
-		return err
+		return nil, err
 	}
-
-	logPath := fmt.Sprintf("%s/%s", config.LogDir, config.LogName)
 
 	// https://github.com/rs/zerolog/issues/77
 	zerolog.TimestampFunc = func() time.Time {
@@ -35,8 +32,8 @@ func InitLogger(config *Config) error {
 	if config.Debug && config.DebugConsoleLog {
 		// デバッグコンソールを JSON 形式で出力
 		if config.DebugConsoleLogJSON {
-			log.Logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
-			return nil
+			logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Str("type", logType).Logger()
+			return &logger, nil
 		}
 
 		writer := zerolog.ConsoleWriter{
@@ -49,16 +46,17 @@ func InitLogger(config *Config) error {
 			NoColor: false,
 		}
 		prettyFormat(&writer)
-		log.Logger = zerolog.New(writer).With().Caller().Timestamp().Logger()
+		logger := zerolog.New(writer).With().Caller().Timestamp().Str("type", logType).Logger()
 
-		return nil
+		return &logger, nil
 	}
 
 	if config.LogStdout {
-		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
-		return nil
+		logger := zerolog.New(os.Stdout).With().Timestamp().Str("type", logType).Logger()
+		return &logger, nil
 	}
 
+	logPath := fmt.Sprintf("%s/%s", config.LogDir, logFilename)
 	writer := &lumberjack.Logger{
 		Filename:   logPath,
 		MaxSize:    config.LogRotateMaxSize,
@@ -66,9 +64,9 @@ func InitLogger(config *Config) error {
 		MaxAge:     config.LogRotateMaxAge,
 		Compress:   config.LogRotateCompress,
 	}
-	log.Logger = zerolog.New(writer).With().Timestamp().Logger()
+	logger := zerolog.New(writer).With().Timestamp().Str("type", logType).Logger()
 
-	return nil
+	return &logger, nil
 }
 
 // 現時点での prettyFormat

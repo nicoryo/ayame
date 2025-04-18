@@ -11,6 +11,28 @@
 
 ## develop
 
+- [CHANGE] シグナリングログファイル名のデフォルトを `signaling.log` から `signaling.jsonl` に変更する
+  - @voluntas
+- [CHANGE] ウェブフックログファイル名のデフォルトを `webhook.log` から `webhook.jsonl` に変更する
+  - @voluntas
+- [ADD] ログ出力時にログのタイプを追加する
+  - `"type": "ayame"` と `"type": "signaling"` と `"type": "webhook"` をそれぞれのログに追加
+- [ADD] ログローテーションの設定を追加
+  - `log_rotate_max_size` はデフォルト 200 MB
+  - `log_rotate_max_backups` はデフォルト 7 日
+  - `log_rotate_max_age` はデフォルト 30 日
+  - `log_rotate_compress` はデフォルト `false`
+- [ADD] 標準出力にログを出力する `log_stdout` を追加する
+  - デフォルト false
+  - シグナリングログとウェブフックログも標準出力に出力する
+  - `log_stdout` が `true` の場合、ファイル出力を行わない
+  - @voluntas
+- [ADD] デバッグコンソールを出力する `debug_console_log` を追加する
+  - デフォルト false
+  - `debug` が `true` かつ `debug_console_log` が `true` の場合のみ有効
+  - `log_stdout` が無効化される
+  - @voluntas
+
 ## 2025.2.0
 
 - [ADD] コンソールログを JSONL 形式で出力できるようにする

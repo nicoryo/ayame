@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/OpenAyame/ayame"
+	zlog "github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,9 +32,11 @@ func main() {
 	}
 
 	// グローバルの logger に代入する
-	if err := ayame.InitLogger(config); err != nil {
+	logger, err := ayame.InitLogger(config, config.LogName, "ayame")
+	if err != nil {
 		log.Fatal(err)
 	}
+	zlog.Logger = *logger
 
 	config.PrintConfig()
 
