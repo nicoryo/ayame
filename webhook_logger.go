@@ -25,10 +25,10 @@ func InitWebhookLogger(config *Config) (*zerolog.Logger, error) {
 
 	writer := &lumberjack.Logger{
 		Filename:   logPath,
-		MaxSize:    logRotateMaxSize,
-		MaxBackups: logRotateMaxBackups,
-		MaxAge:     logRotateMaxAge,
-		Compress:   true,
+		MaxSize:    config.LogRotateMaxSize,
+		MaxBackups: config.LogRotateMaxBackups,
+		MaxAge:     config.LogRotateMaxAge,
+		Compress:   config.LogRotateCompress,
 	}
 
 	writers := io.MultiWriter(writer)

@@ -2,7 +2,6 @@ package ayame
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,28 +12,12 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var (
-	// megabytes
-	logRotateMaxSize    = 10
-	logRotateMaxBackups = 5
-	//days
-	logRotateMaxAge = 30
-)
-
 func InitLogger(config *Config) error {
 	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
 		return err
 	}
 
 	logPath := fmt.Sprintf("%s/%s", config.LogDir, config.LogName)
-
-	writer := &lumberjack.Logger{
-		Filename:   logPath,
-		MaxSize:    logRotateMaxSize,
-		MaxBackups: logRotateMaxBackups,
-		MaxAge:     logRotateMaxAge,
-		Compress:   true,
-	}
 
 	// https://github.com/rs/zerolog/issues/77
 	zerolog.TimestampFunc = func() time.Time {
@@ -47,22 +30,42 @@ func InitLogger(config *Config) error {
 	if err != nil {
 		return err
 	}
-	// ayame.log のファイル出力は JSON Lines 形式のみ
-	if config.Debug && config.ConsoleLogJSON {
-		// デバッグが有効かつ JSON Lines 形式で出力する場合
-		writers := io.MultiWriter(os.Stdout, writer)
-		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
-	} else if config.Debug {
-		// デバッグが有効
-		// わかりにくいが NoColor なので !config.ConsoleLogColor となる
-		stdout := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: !config.ConsoleLogColor, TimeFormat: "2006-01-02 15:04:05.000000Z"}
-		prettyFormat(&stdout)
-		writers := io.MultiWriter(stdout, writer)
-		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
-	} else {
-		// デバッグが無効な場合はファイル出力のみ
-		log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
+
+	if config.Debug && config.DebugConsoleLog {
+		// デバッグコンソールを JSON 形式で出力
+		if config.DebugConsoleLogJSON {
+			log.Logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger().Level(logLevel)
+			return nil
+		}
+
+		writer := zerolog.ConsoleWriter{
+			Out: os.Stdout,
+			FormatTimestamp: func(i interface{}) string {
+				darkGray := "\x1b[90m"
+				reset := "\x1b[0m"
+				return strings.Join([]string{darkGray, i.(string), reset}, "")
+			},
+			NoColor: false,
+		}
+		prettyFormat(&writer)
+		log.Logger = zerolog.New(writer).With().Caller().Timestamp().Logger().Level(logLevel)
+
+		return nil
 	}
+
+	if config.LogStdout {
+		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger().Level(logLevel)
+		return nil
+	}
+
+	writer := &lumberjack.Logger{
+		Filename:   logPath,
+		MaxSize:    config.LogRotateMaxSize,
+		MaxBackups: config.LogRotateMaxBackups,
+		MaxAge:     config.LogRotateMaxAge,
+		Compress:   config.LogRotateCompress,
+	}
+	log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
 
 	return nil
 }
