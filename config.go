@@ -12,9 +12,14 @@ import (
 var Version string
 
 const (
-	defaultLogDir                = "."
-	defaultLogName               = "ayame.log"
-	defaultSignalingLogName      = "signaling.log"
+	defaultLogDir           = "."
+	defaultLogName          = "ayame.log"
+	defaultSignalingLogName = "signaling.log"
+
+	defaultWebSocketReadTimeoutSec  = 90
+	defaultWebSocketPongTimeoutSec  = 60
+	defaultWebSocketPingIntervalSec = 5
+
 	defaultWebhookLogName        = "webhook.log"
 	defaultWebhookRequestTimeout = 5
 
@@ -33,6 +38,13 @@ type Config struct {
 
 	ListenIPv4Address string `ini:"listen_ipv4_address"`
 	ListenPortNumber  int32  `ini:"listen_port_number"`
+
+	// socket の待ち受け時間
+	WebSocketReadTimeoutSec int32 `ini:"websocket_read_timeout_sec"`
+	// pong が送られてこないためタイムアウトにするまでの時間
+	WebSocketPongTimeoutSec int32 `ini:"websocket_pong_timeout_sec"`
+	// ping 送信の時間間隔
+	WebSocketPingIntervalSec int32 `ini:"websocket_ping_interval_sec"`
 
 	AuthnWebhookURL      string `ini:"authn_webhook_url"`
 	DisconnectWebhookURL string `ini:"disconnect_webhook_url"`
@@ -86,6 +98,18 @@ func setDefaultsConfig(config *Config) {
 		config.SignalingLogName = defaultSignalingLogName
 	}
 
+	if config.WebSocketReadTimeoutSec == 0 {
+		config.WebSocketReadTimeoutSec = defaultWebSocketReadTimeoutSec
+	}
+
+	if config.WebSocketPongTimeoutSec == 0 {
+		config.WebSocketPongTimeoutSec = defaultWebSocketPongTimeoutSec
+	}
+
+	if config.WebSocketPingIntervalSec == 0 {
+		config.WebSocketPingIntervalSec = defaultWebSocketPingIntervalSec
+	}
+
 	if config.WebhookLogName == "" {
 		config.WebhookLogName = defaultWebhookLogName
 	}
@@ -102,17 +126,20 @@ func setDefaultsConfig(config *Config) {
 		config.ListenPrometheusPortNumber = defaultListenPrometheusPortNumber
 	}
 
-	zlog.Info().Bool("debug", config.Debug).Msg("AyameConf")
-	zlog.Info().Str("log_dir", config.LogDir).Msg("AyameConf")
-	zlog.Info().Str("log_name", config.LogName).Msg("AyameConf")
-	zlog.Info().Str("log_level", config.LogLevel).Msg("AyameConf")
-	zlog.Info().Str("signaling_log_name", config.SignalingLogName).Msg("AyameConf")
-	zlog.Info().Str("listen_ipv4_address", config.ListenIPv4Address).Msg("AyameConf")
-	zlog.Info().Int32("listen_port_number", config.ListenPortNumber).Msg("AyameConf")
-	zlog.Info().Str("authn_webhook_url", config.AuthnWebhookURL).Msg("AyameConf")
-	zlog.Info().Str("disconnect_webhook_url", config.DisconnectWebhookURL).Msg("AyameConf")
-	zlog.Info().Str("webhook_log_name", config.WebhookLogName).Msg("AyameConf")
-	zlog.Info().Int32("webhook_request_timeout_sec", config.WebhookRequestTimeoutSec)
-	zlog.Info().Str("prometheus_ipv4_address", config.ListenPrometheusIPv4Address).Msg("AyameConf")
-	zlog.Info().Int32("prometheus_port", config.ListenPrometheusPortNumber).Msg("AyameConf")
+}
+
+func (c *Config) PrintConfig() {
+	zlog.Info().Bool("debug", c.Debug).Msg("AyameConf")
+	zlog.Info().Str("log_dir", c.LogDir).Msg("AyameConf")
+	zlog.Info().Str("log_name", c.LogName).Msg("AyameConf")
+	zlog.Info().Str("log_level", c.LogLevel).Msg("AyameConf")
+	zlog.Info().Str("signaling_log_name", c.SignalingLogName).Msg("AyameConf")
+	zlog.Info().Str("listen_ipv4_address", c.ListenIPv4Address).Msg("AyameConf")
+	zlog.Info().Int32("listen_port_number", c.ListenPortNumber).Msg("AyameConf")
+	zlog.Info().Str("authn_webhook_url", c.AuthnWebhookURL).Msg("AyameConf")
+	zlog.Info().Str("disconnect_webhook_url", c.DisconnectWebhookURL).Msg("AyameConf")
+	zlog.Info().Str("webhook_log_name", c.WebhookLogName).Msg("AyameConf")
+	zlog.Info().Int32("webhook_request_timeout_sec", c.WebhookRequestTimeoutSec).Msg("AyameConf")
+	zlog.Info().Str("prometheus_ipv4_address", c.ListenPrometheusIPv4Address).Msg("AyameConf")
+	zlog.Info().Int32("prometheus_port", c.ListenPrometheusPortNumber).Msg("AyameConf")
 }
