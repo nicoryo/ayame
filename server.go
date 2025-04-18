@@ -57,6 +57,7 @@ func NewServer(config *Config) (*Server, error) {
 
 	echoPrometheus := echo.New()
 	echoPrometheus.HideBanner = true
+	echoPrometheus.HidePort = true
 
 	p := prometheus.NewPrometheus("ayame", nil, metricsList)
 	e.Use(p.HandlerFunc)
