@@ -15,6 +15,14 @@
   - WebSocket の待ち受け時間を設定する `websocket_read_timeout_sec` を追加
   - WebSocket の Pong が送られてこないためタイムアウトにするまでの時間を設定する `websocket_pong_timeout_sec` を追加
   - WebSocket の Ping 送信の時間間隔を設定する `websocket_ping_interval_sec` を追加
+
+### misc
+
+- [UPDATE] CI の dominikh/staticcheck-action を v1 固定する
+  - @voluntas
+- [UPDATE] CI の staticcheck を 2025.1.1 に上げる
+  - @voluntas
+- [UPDATE] go.mod の Go 1.24.1 に上げる
   - @voluntas
 
 ## 2024.1.0
