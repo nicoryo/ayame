@@ -14,11 +14,11 @@
 ## 2025.2.0
 
 - [ADD] コンソールログを JSONL 形式で出力できるようにする
-  - `console_log_json` を追加
+  - 設定ファイルに `console_log_json` を追加
   - デフォルト false
   - @voluntas
 - [ADD] コンソールログのカラー有効化を指定できるようにする
-  - `console_log_color` を追加
+  - 設定ファイルに `console_log_color` を追加
   - デフォルト true
   - @voluntas
 
