@@ -39,8 +39,10 @@ func (s *Server) signalingHandler(c echo.Context) error {
 
 	wsConn.SetReadLimit(readLimit)
 
-	// ここで connectionId みたいなの作るべき
 	connection := connection{
+		// connectionId を設定する
+		ID: getULID(),
+
 		wsConn: wsConn,
 		// 複数箇所でブロックした時を考えて少し余裕をもたせる
 		forwardChannel: make(chan forward, 100),
