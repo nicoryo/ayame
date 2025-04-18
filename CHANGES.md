@@ -11,6 +11,8 @@
 
 ## develop
 
+## 2025.1.0
+
 - [CHANGE] ayame.log を JSONL 形式で出力するようにする
   - @voluntas
 - [CHANGE] シグナリングで利用する WebSocket の設定を定数から設定できるように変更する
