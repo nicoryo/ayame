@@ -1,23 +1,32 @@
 package ayame
 
 import (
+	"slices"
+
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
 )
 
 func (c *connection) signalingLog(message message, rawMessage []byte) {
+	// signaling の type を指定してフィルターできる
+	// signaling_log_filters = register,offer,answer
+	if !slices.Contains(c.config.SignalingLogFilters, message.Type) {
+		return
+	}
+
 	if message.Type != "pong" {
 		if c.config.Debug {
-			c.signalingLogger.Log().
+			c.signalingLogger.Debug().
 				Str("roomId", c.roomID).
-				Str("clientID", c.clientID).
+				Str("clientId", c.clientID).
 				Str("connectionId", c.ID).
 				Str("type", message.Type).
-				Msg(string(rawMessage))
+				Str("rawMessage", string(rawMessage)).
+				Send()
 		} else {
-			c.signalingLogger.Log().
+			c.signalingLogger.Info().
 				Str("roomId", c.roomID).
-				Str("clientID", c.clientID).
+				Str("clientId", c.clientID).
 				Str("connectionId", c.ID).
 				Str("type", message.Type).
 				Send()

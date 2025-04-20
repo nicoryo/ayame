@@ -43,7 +43,8 @@ type Config struct {
 	LogRotateMaxAge     int    `ini:"log_rotate_max_age"`
 	LogRotateCompress   bool   `ini:"log_rotate_compress"`
 
-	SignalingLogName string `ini:"signaling_log_name"`
+	SignalingLogName    string   `ini:"signaling_log_name"`
+	SignalingLogFilters []string `ini:"signaling_log_filters"`
 
 	DebugConsoleLog     bool `ini:"debug_console_log"`
 	DebugConsoleLogJSON bool `ini:"debug_console_log_json"`
@@ -155,6 +156,7 @@ func (c *Config) PrintConfig() {
 	zlog.Info().Bool("log_rotate_compress", c.LogRotateCompress).Msg("AyameConf")
 
 	zlog.Info().Str("signaling_log_name", c.SignalingLogName).Msg("AyameConf")
+	zlog.Info().Strs("signaling_log_filters", c.SignalingLogFilters).Msg("AyameConf")
 
 	zlog.Info().Bool("debug_console_log", c.DebugConsoleLog).Msg("AyameConf")
 	zlog.Info().Bool("debug_console_log_json", c.DebugConsoleLogJSON).Msg("AyameConf")

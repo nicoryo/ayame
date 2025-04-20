@@ -32,13 +32,13 @@ func InitLogger(config *Config) error {
 	return nil
 }
 
-func NewLogger(config *Config, logFilename string, logType string) (*zerolog.Logger, error) {
+func NewLogger(config *Config, logFilename string, logDomain string) (*zerolog.Logger, error) {
 	// デバッグコンソールログを出力する
 	// デバッグコンソールには Caller を出力する
 	if config.Debug && config.DebugConsoleLog {
 		// デバッグコンソールを JSON 形式で出力
 		if config.DebugConsoleLogJSON {
-			logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Str("type", logType).Logger()
+			logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Str("domain", logDomain).Logger()
 			return &logger, nil
 		}
 
@@ -53,14 +53,14 @@ func NewLogger(config *Config, logFilename string, logType string) (*zerolog.Log
 			NoColor: false,
 		}
 		prettyFormat(&writer)
-		logger := zerolog.New(writer).With().Caller().Timestamp().Str("type", logType).Logger()
+		logger := zerolog.New(writer).With().Caller().Timestamp().Str("domain", logDomain).Logger()
 
 		return &logger, nil
 	}
 
 	// 標準出力にログを出力する
 	if config.LogStdout {
-		logger := zerolog.New(os.Stdout).With().Timestamp().Str("type", logType).Logger()
+		logger := zerolog.New(os.Stdout).With().Timestamp().Str("domain", logDomain).Logger()
 		return &logger, nil
 	}
 
@@ -73,7 +73,7 @@ func NewLogger(config *Config, logFilename string, logType string) (*zerolog.Log
 		MaxAge:     config.LogRotateMaxAge,
 		Compress:   config.LogRotateCompress,
 	}
-	logger := zerolog.New(writer).With().Timestamp().Str("type", logType).Logger()
+	logger := zerolog.New(writer).With().Timestamp().Str("domain", logDomain).Logger()
 
 	return &logger, nil
 }
@@ -87,6 +87,7 @@ func prettyFormat(w *zerolog.ConsoleWriter) {
 		var color, level string
 		// TODO: 各色を定数に置き換える
 		// TODO: 他の logLevel が必要な場合は追加する
+
 		switch i.(string) {
 		case "info":
 			color = "\x1b[32m"
