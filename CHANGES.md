@@ -30,9 +30,9 @@
 - [ADD] デバッグコンソールを出力する `debug_console_log` を追加する
   - デフォルト false
   - `debug` が `true` かつ `debug_console_log` が `true` の場合のみ有効
-  - `log_stdout` が無効化される
+  - 標準出力にのみデバッグコンソールが出力されるようになり、ファイル出力はされない
   - @voluntas
-- [FIX] WebSocket 確立後にメッセージが送られてきたタイミングで connectionId を生成するように修正する
+- [FIX] WebSocket 確立後にメッセージが送られてきたタイミングで `connectionId` を生成するように修正する
   - @voluntas
 
 ## 2025.2.0

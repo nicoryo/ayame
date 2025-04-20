@@ -11,9 +11,9 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func InitLogger(config *Config, logFilename string, logType string) (*zerolog.Logger, error) {
+func InitLogger(config *Config) error {
 	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
-		return nil, err
+		return err
 	}
 
 	// https://github.com/rs/zerolog/issues/77
@@ -29,6 +29,12 @@ func InitLogger(config *Config, logFilename string, logType string) (*zerolog.Lo
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
+	return nil
+}
+
+func NewLogger(config *Config, logFilename string, logType string) (*zerolog.Logger, error) {
+	// デバッグコンソールログを出力する
+	// デバッグコンソールには Caller を出力する
 	if config.Debug && config.DebugConsoleLog {
 		// デバッグコンソールを JSON 形式で出力
 		if config.DebugConsoleLogJSON {
@@ -36,6 +42,7 @@ func InitLogger(config *Config, logFilename string, logType string) (*zerolog.Lo
 			return &logger, nil
 		}
 
+		// デバッグコンソールをヒューマンリーダブルな形式で出力
 		writer := zerolog.ConsoleWriter{
 			Out: os.Stdout,
 			FormatTimestamp: func(i interface{}) string {
@@ -51,11 +58,13 @@ func InitLogger(config *Config, logFilename string, logType string) (*zerolog.Lo
 		return &logger, nil
 	}
 
+	// 標準出力にログを出力する
 	if config.LogStdout {
 		logger := zerolog.New(os.Stdout).With().Timestamp().Str("type", logType).Logger()
 		return &logger, nil
 	}
 
+	// ログファイルを出力する
 	logPath := fmt.Sprintf("%s/%s", config.LogDir, logFilename)
 	writer := &lumberjack.Logger{
 		Filename:   logPath,
