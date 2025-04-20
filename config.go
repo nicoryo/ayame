@@ -113,6 +113,10 @@ func setDefaultsConfig(config *Config) {
 		config.SignalingLogName = defaultSignalingLogName
 	}
 
+	if config.SignalingLogFilters == nil {
+		config.SignalingLogFilters = []string{"register", "offer", "answer", "candidate", "connected", "message"}
+	}
+
 	if config.WebSocketReadTimeoutSec == 0 {
 		config.WebSocketReadTimeoutSec = defaultWebSocketReadTimeoutSec
 	}
