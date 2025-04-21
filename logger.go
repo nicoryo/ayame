@@ -12,10 +12,6 @@ import (
 )
 
 func InitLogger(config *Config) error {
-	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
-		return err
-	}
-
 	// https://github.com/rs/zerolog/issues/77
 	zerolog.TimestampFunc = func() time.Time {
 		return time.Now().UTC()
@@ -64,16 +60,21 @@ func NewLogger(config *Config, logFilename string, logDomain string) (*zerolog.L
 		return &logger, nil
 	}
 
+	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
+		return nil, err
+	}
+
 	// ログファイルを出力する
 	logPath := fmt.Sprintf("%s/%s", config.LogDir, logFilename)
-	writer := &lumberjack.Logger{
+
+	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logPath,
 		MaxSize:    config.LogRotateMaxSize,
 		MaxBackups: config.LogRotateMaxBackups,
 		MaxAge:     config.LogRotateMaxAge,
 		Compress:   config.LogRotateCompress,
 	}
-	logger := zerolog.New(writer).With().Timestamp().Str("domain", logDomain).Logger()
+	logger := zerolog.New(lumberjackLogger).With().Timestamp().Str("domain", logDomain).Logger()
 
 	return &logger, nil
 }

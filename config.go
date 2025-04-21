@@ -123,7 +123,7 @@ func setDefaultsConfig(config *Config) {
 	}
 
 	if config.LogName == "" {
-		config.LogDir = defaultLogName
+		config.LogName = defaultLogName
 	}
 
 	if config.SignalingLogName == "" {
