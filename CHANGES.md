@@ -16,15 +16,17 @@
 - [CHANGE] ウェブフックログファイル名のデフォルトを `webhook.log` から `webhook.jsonl` に変更する
   - @voluntas
 - [ADD] ログ出力時にログのドメインを追加する
-  - `"domain": "ayame"` と `"domain": "signaling"` と `"domain": "webhook"` をそれぞれのログに追加
+  - `"domain": "ayame"` と `"domain": "signaling"` と `"domain": "webhook"` をそれぞれのログに追加する
+  - @voluntas
 - [ADD] シグナリングログで type を指定してフィルターできるようにする
   - `signaling_log_filters` に type を指定する
   - @voluntas
-- [ADD] ログローテーションの設定を追加
+- [ADD] ログローテーションの設定を追加する
   - `log_rotate_max_size` はデフォルト 200 MB
   - `log_rotate_max_backups` はデフォルト 7 日
   - `log_rotate_max_age` はデフォルト 30 日
   - `log_rotate_compress` はデフォルト `false`
+  - @voluntas
 - [ADD] 標準出力にログを出力する `log_stdout` を追加する
   - デフォルト false
   - シグナリングログとウェブフックログも標準出力に出力する
