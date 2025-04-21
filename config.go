@@ -21,8 +21,6 @@ const (
 	defaultLogRotateMaxBackups = 7
 	// 30 日
 	defaultLogRotateMaxAge = 30
-	// 圧縮しない
-	defaultLogRotateCompress = false
 
 	defaultSignalingLogName = "signaling.jsonl"
 
@@ -124,6 +122,18 @@ func setDefaultsConfig(config *Config) {
 
 	if config.LogName == "" {
 		config.LogName = defaultLogName
+	}
+
+	if config.LogRotateMaxSize == 0 {
+		config.LogRotateMaxSize = defaultLogRotateMaxSize
+	}
+
+	if config.LogRotateMaxBackups == 0 {
+		config.LogRotateMaxBackups = defaultLogRotateMaxBackups
+	}
+
+	if config.LogRotateMaxAge == 0 {
+		config.LogRotateMaxAge = defaultLogRotateMaxAge
 	}
 
 	if config.SignalingLogName == "" {
