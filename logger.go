@@ -2,40 +2,16 @@ package ayame
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var (
-	// megabytes
-	logRotateMaxSize    = 10
-	logRotateMaxBackups = 5
-	//days
-	logRotateMaxAge = 30
-)
-
 func InitLogger(config *Config) error {
-	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
-		return err
-	}
-
-	logPath := fmt.Sprintf("%s/%s", config.LogDir, config.LogName)
-
-	writer := &lumberjack.Logger{
-		Filename:   logPath,
-		MaxSize:    logRotateMaxSize,
-		MaxBackups: logRotateMaxBackups,
-		MaxAge:     logRotateMaxAge,
-		Compress:   true,
-	}
-
 	// https://github.com/rs/zerolog/issues/77
 	zerolog.TimestampFunc = func() time.Time {
 		return time.Now().UTC()
@@ -43,28 +19,64 @@ func InitLogger(config *Config) error {
 
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 
-	logLevel, err := parseLevel(*config)
-	if err != nil {
-		return err
-	}
-	// ayame.log のファイル出力は JSON Lines 形式のみ
-	if config.Debug && config.ConsoleLogJSON {
-		// デバッグが有効かつ JSON Lines 形式で出力する場合
-		writers := io.MultiWriter(os.Stdout, writer)
-		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
-	} else if config.Debug {
-		// デバッグが有効
-		// わかりにくいが NoColor なので !config.ConsoleLogColor となる
-		stdout := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: !config.ConsoleLogColor, TimeFormat: "2006-01-02 15:04:05.000000Z"}
-		prettyFormat(&stdout)
-		writers := io.MultiWriter(stdout, writer)
-		log.Logger = zerolog.New(writers).With().Caller().Timestamp().Logger().Level(logLevel)
+	if config.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
-		// デバッグが無効な場合はファイル出力のみ
-		log.Logger = zerolog.New(writer).With().Timestamp().Logger().Level(logLevel)
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
 	return nil
+}
+
+func NewLogger(config *Config, logFilename string, logDomain string) (*zerolog.Logger, error) {
+	// デバッグコンソールログを出力する
+	// デバッグコンソールには Caller を出力する
+	if config.Debug && config.DebugConsoleLog {
+		// デバッグコンソールを JSON 形式で出力
+		if config.DebugConsoleLogJSON {
+			logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Str("domain", logDomain).Logger()
+			return &logger, nil
+		}
+
+		// デバッグコンソールをヒューマンリーダブルな形式で出力
+		writer := zerolog.ConsoleWriter{
+			Out: os.Stdout,
+			FormatTimestamp: func(i interface{}) string {
+				darkGray := "\x1b[90m"
+				reset := "\x1b[0m"
+				return strings.Join([]string{darkGray, i.(string), reset}, "")
+			},
+			NoColor: false,
+		}
+		prettyFormat(&writer)
+		logger := zerolog.New(writer).With().Caller().Timestamp().Str("domain", logDomain).Logger()
+
+		return &logger, nil
+	}
+
+	// 標準出力にログを出力する
+	if config.LogStdout {
+		logger := zerolog.New(os.Stdout).With().Timestamp().Str("domain", logDomain).Logger()
+		return &logger, nil
+	}
+
+	if f, err := os.Stat(config.LogDir); os.IsNotExist(err) || !f.IsDir() {
+		return nil, err
+	}
+
+	// ログファイルを出力する
+	logPath := fmt.Sprintf("%s/%s", config.LogDir, logFilename)
+
+	lumberjackLogger := &lumberjack.Logger{
+		Filename:   logPath,
+		MaxSize:    config.LogRotateMaxSize,
+		MaxBackups: config.LogRotateMaxBackups,
+		MaxAge:     config.LogRotateMaxAge,
+		Compress:   config.LogRotateCompress,
+	}
+	logger := zerolog.New(lumberjackLogger).With().Timestamp().Str("domain", logDomain).Logger()
+
+	return &logger, nil
 }
 
 // 現時点での prettyFormat
@@ -76,6 +88,7 @@ func prettyFormat(w *zerolog.ConsoleWriter) {
 		var color, level string
 		// TODO: 各色を定数に置き換える
 		// TODO: 他の logLevel が必要な場合は追加する
+
 		switch i.(string) {
 		case "info":
 			color = "\x1b[32m"
@@ -113,24 +126,4 @@ func prettyFormat(w *zerolog.ConsoleWriter) {
 	w.FormatFieldValue = func(i interface{}) string {
 		return fmt.Sprintf("%s", i)
 	}
-}
-
-func parseLevel(config Config) (zerolog.Level, error) {
-	// debug: true の場合の log_level は debug で固定
-	if config.Debug {
-		return zerolog.DebugLevel, nil
-	}
-
-	// 空文字列は NoLevel 扱いで ParseLevel でエラーにならないため事前に確認する
-	if config.LogLevel == "" {
-		return zerolog.NoLevel, errConfigInvalidLogLevel
-	}
-
-	logLevel, err := zerolog.ParseLevel(config.LogLevel)
-	if err != nil {
-		// err は継続するように読めるのでここで捨てる
-		return logLevel, errConfigInvalidLogLevel
-	}
-
-	return logLevel, nil
 }

@@ -12,32 +12,57 @@ import (
 var Version string
 
 const (
-	defaultLogDir           = "."
-	defaultLogName          = "ayame.log"
-	defaultSignalingLogName = "signaling.log"
+	defaultLogDir  = "."
+	defaultLogName = "ayame.jsonl"
+
+	// 200 MB
+	defaultLogRotateMaxSize = 200
+	// 7 ファイル
+	defaultLogRotateMaxBackups = 7
+	// 30 日
+	defaultLogRotateMaxAge = 30
+
+	defaultSignalingLogName = "signaling.jsonl"
+
+	defaultListenIPv4Address = "0.0.0.0"
+	defaultListenPortNumber  = 3000
 
 	defaultWebSocketReadTimeoutSec  = 90
 	defaultWebSocketPongTimeoutSec  = 60
 	defaultWebSocketPingIntervalSec = 5
 
-	defaultWebhookLogName        = "webhook.log"
 	defaultWebhookRequestTimeout = 5
+	defaultWebhookLogName        = "webhook.jsonl"
 
 	defaultListenPrometheusIPv4Address = "0.0.0.0"
 	defaultListenPrometheusPortNumber  = 4000
 )
 
+var defaultSignalingLogFilters = []string{
+	"register",
+	"offer",
+	"answer",
+	"candidate",
+	"connected",
+	"message",
+}
+
 type Config struct {
 	Debug bool `ini:"debug"`
 
-	LogDir   string `ini:"log_dir"`
-	LogName  string `ini:"log_name"`
-	LogLevel string `ini:"log_level"`
+	LogDir              string `ini:"log_dir"`
+	LogName             string `ini:"log_name"`
+	LogStdout           bool   `ini:"log_stdout"`
+	LogRotateMaxSize    int    `ini:"log_rotate_max_size"`
+	LogRotateMaxBackups int    `ini:"log_rotate_max_backups"`
+	LogRotateMaxAge     int    `ini:"log_rotate_max_age"`
+	LogRotateCompress   bool   `ini:"log_rotate_compress"`
 
-	ConsoleLogJSON  bool `ini:"console_log_json"`
-	ConsoleLogColor bool `ini:"console_log_color"`
+	SignalingLogName    string   `ini:"signaling_log_name"`
+	SignalingLogFilters []string `ini:"signaling_log_filters"`
 
-	SignalingLogName string `ini:"signaling_log_name"`
+	DebugConsoleLog     bool `ini:"debug_console_log"`
+	DebugConsoleLogJSON bool `ini:"debug_console_log_json"`
 
 	TypeMessage bool `ini:"type_message"`
 
@@ -96,11 +121,35 @@ func setDefaultsConfig(config *Config) {
 	}
 
 	if config.LogName == "" {
-		config.LogDir = defaultLogName
+		config.LogName = defaultLogName
+	}
+
+	if config.LogRotateMaxSize == 0 {
+		config.LogRotateMaxSize = defaultLogRotateMaxSize
+	}
+
+	if config.LogRotateMaxBackups == 0 {
+		config.LogRotateMaxBackups = defaultLogRotateMaxBackups
+	}
+
+	if config.LogRotateMaxAge == 0 {
+		config.LogRotateMaxAge = defaultLogRotateMaxAge
 	}
 
 	if config.SignalingLogName == "" {
 		config.SignalingLogName = defaultSignalingLogName
+	}
+
+	if config.SignalingLogFilters == nil {
+		config.SignalingLogFilters = defaultSignalingLogFilters
+	}
+
+	if config.ListenIPv4Address == "" {
+		config.ListenIPv4Address = defaultListenIPv4Address
+	}
+
+	if config.ListenPortNumber == 0 {
+		config.ListenPortNumber = defaultListenPortNumber
 	}
 
 	if config.WebSocketReadTimeoutSec == 0 {
@@ -115,12 +164,12 @@ func setDefaultsConfig(config *Config) {
 		config.WebSocketPingIntervalSec = defaultWebSocketPingIntervalSec
 	}
 
-	if config.WebhookLogName == "" {
-		config.WebhookLogName = defaultWebhookLogName
-	}
-
 	if config.WebhookRequestTimeoutSec == 0 {
 		config.WebhookRequestTimeoutSec = defaultWebhookRequestTimeout
+	}
+
+	if config.WebhookLogName == "" {
+		config.WebhookLogName = defaultWebhookLogName
 	}
 
 	if config.ListenPrometheusIPv4Address == "" {
@@ -135,16 +184,31 @@ func setDefaultsConfig(config *Config) {
 
 func (c *Config) PrintConfig() {
 	zlog.Info().Bool("debug", c.Debug).Msg("AyameConf")
+
 	zlog.Info().Str("log_dir", c.LogDir).Msg("AyameConf")
 	zlog.Info().Str("log_name", c.LogName).Msg("AyameConf")
-	zlog.Info().Str("log_level", c.LogLevel).Msg("AyameConf")
+	zlog.Info().Bool("log_stdout", c.LogStdout).Msg("AyameConf")
+
+	zlog.Info().Int("log_rotate_max_size", c.LogRotateMaxSize).Msg("AyameConf")
+	zlog.Info().Int("log_rotate_max_backups", c.LogRotateMaxBackups).Msg("AyameConf")
+	zlog.Info().Int("log_rotate_max_age", c.LogRotateMaxAge).Msg("AyameConf")
+	zlog.Info().Bool("log_rotate_compress", c.LogRotateCompress).Msg("AyameConf")
+
 	zlog.Info().Str("signaling_log_name", c.SignalingLogName).Msg("AyameConf")
+	zlog.Info().Strs("signaling_log_filters", c.SignalingLogFilters).Msg("AyameConf")
+
+	zlog.Info().Bool("debug_console_log", c.DebugConsoleLog).Msg("AyameConf")
+	zlog.Info().Bool("debug_console_log_json", c.DebugConsoleLogJSON).Msg("AyameConf")
+
 	zlog.Info().Str("listen_ipv4_address", c.ListenIPv4Address).Msg("AyameConf")
 	zlog.Info().Int32("listen_port_number", c.ListenPortNumber).Msg("AyameConf")
+
 	zlog.Info().Str("authn_webhook_url", c.AuthnWebhookURL).Msg("AyameConf")
 	zlog.Info().Str("disconnect_webhook_url", c.DisconnectWebhookURL).Msg("AyameConf")
+
 	zlog.Info().Str("webhook_log_name", c.WebhookLogName).Msg("AyameConf")
 	zlog.Info().Int32("webhook_request_timeout_sec", c.WebhookRequestTimeoutSec).Msg("AyameConf")
+
 	zlog.Info().Str("prometheus_ipv4_address", c.ListenPrometheusIPv4Address).Msg("AyameConf")
 	zlog.Info().Int32("prometheus_port", c.ListenPrometheusPortNumber).Msg("AyameConf")
 }

@@ -268,9 +268,6 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 		return errUnexpectedJSON
 	}
 
-	// 受信したメッセージで message type がパースできたものをログとして保存する
-	c.signalingLog(*message, rawMessage)
-
 	switch message.Type {
 	case "pong":
 		timerStop(pongTimeoutTimer)
@@ -281,8 +278,6 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Bytes("rawMessage", rawMessage).Msg("InternalServer")
 			return errInternalServer
 		}
-
-		c.ID = getULID()
 
 		registerMessage := &registerMessage{}
 		if err := json.Unmarshal(rawMessage, &registerMessage); err != nil {
@@ -317,6 +312,9 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 		c.ayameClient = registerMessage.AyameClient
 		c.environment = registerMessage.Environment
 		c.libwebrtc = registerMessage.Libwebrtc
+
+		// ログ出力
+		c.signalingLog(*message, rawMessage)
 
 		// Webhook 系のエラーログは Caller をつける
 		resp, err := c.authnWebhook()
@@ -390,6 +388,8 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Msg("RegistrationIncomplete")
 			return errRegistrationIncomplete
 		}
+		// ログ出力
+		c.signalingLog(*message, rawMessage)
 		c.forward(rawMessage)
 	case "message":
 		// 設定が有効でなければ default と同じ処理
@@ -403,6 +403,8 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Msg("RegistrationIncomplete")
 			return errRegistrationIncomplete
 		}
+		// ログ出力
+		c.signalingLog(*message, rawMessage)
 		c.forward(rawMessage)
 	case "connected":
 		// register が完了していない
@@ -416,6 +418,8 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Err(err).Send()
 			return err
 		}
+		// ログ出力
+		c.signalingLog(*message, rawMessage)
 	default:
 		c.errLog().Msg("InvalidMessageType")
 		return errInvalidMessageType
