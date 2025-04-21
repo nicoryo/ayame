@@ -11,6 +11,8 @@
 
 ## develop
 
+## 2025.3.0
+
 - [CHANGE] シグナリングログファイル名のデフォルトを `signaling.log` から `signaling.jsonl` に変更する
   - @voluntas
 - [CHANGE] ウェブフックログファイル名のデフォルトを `webhook.log` から `webhook.jsonl` に変更する
