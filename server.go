@@ -25,12 +25,14 @@ type Server struct {
 }
 
 func NewServer(config *Config) (*Server, error) {
-	signalingLogger, err := InitSignalingLogger(config)
+	// signaling.jsonl ロガーを用意
+	signalingLogger, err := NewLogger(config, config.SignalingLogName, "signaling")
 	if err != nil {
 		return nil, err
 	}
 
-	webhookLogger, err := InitWebhookLogger(config)
+	// webhook.jsonl ロガーを用意
+	webhookLogger, err := NewLogger(config, config.WebhookLogName, "webhook")
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +59,7 @@ func NewServer(config *Config) (*Server, error) {
 
 	echoPrometheus := echo.New()
 	echoPrometheus.HideBanner = true
+	echoPrometheus.HidePort = true
 
 	p := prometheus.NewPrometheus("ayame", nil, metricsList)
 	e.Use(p.HandlerFunc)

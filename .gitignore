@@ -1,6 +1,11 @@
 # ayame binary
 bin/*
 config.ini
-# log file
+
+# 新しいログ形式
+*.jsonl
+*.jsonl.*
+
+# 古いログ形式
 *.log
 *.log.*
