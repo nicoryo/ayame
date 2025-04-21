@@ -313,6 +313,7 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 		c.environment = registerMessage.Environment
 		c.libwebrtc = registerMessage.Libwebrtc
 
+		// ログ出力
 		c.signalingLog(*message, rawMessage)
 
 		// Webhook 系のエラーログは Caller をつける
@@ -387,6 +388,7 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Msg("RegistrationIncomplete")
 			return errRegistrationIncomplete
 		}
+		// ログ出力
 		c.signalingLog(*message, rawMessage)
 		c.forward(rawMessage)
 	case "message":
@@ -401,6 +403,7 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Msg("RegistrationIncomplete")
 			return errRegistrationIncomplete
 		}
+		// ログ出力
 		c.signalingLog(*message, rawMessage)
 		c.forward(rawMessage)
 	case "connected":
@@ -415,6 +418,7 @@ func (c *connection) handleWsMessage(rawMessage []byte, pongTimeoutTimer *time.T
 			c.errLog().Err(err).Send()
 			return err
 		}
+		// ログ出力
 		c.signalingLog(*message, rawMessage)
 	default:
 		c.errLog().Msg("InvalidMessageType")

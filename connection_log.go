@@ -8,30 +8,28 @@ import (
 )
 
 func (c *connection) signalingLog(message message, rawMessage []byte) {
-	// signaling の type を指定してフィルターできる
-	// signaling_log_filters = register,offer,answer
+	// signaling の type を指定してフィルターする
 	if !slices.Contains(c.config.SignalingLogFilters, message.Type) {
 		return
 	}
 
-	if message.Type != "pong" {
-		if c.config.Debug {
-			c.signalingLogger.Debug().
-				Str("roomId", c.roomID).
-				Str("clientId", c.clientID).
-				Str("connectionId", c.ID).
-				Str("type", message.Type).
-				Str("rawMessage", string(rawMessage)).
-				Send()
-		} else {
-			c.signalingLogger.Info().
-				Str("roomId", c.roomID).
-				Str("clientId", c.clientID).
-				Str("connectionId", c.ID).
-				Str("type", message.Type).
-				Send()
-		}
+	if c.config.Debug {
+		c.signalingLogger.Debug().
+			Str("roomId", c.roomID).
+			Str("clientId", c.clientID).
+			Str("connectionId", c.ID).
+			Str("type", message.Type).
+			Str("rawMessage", string(rawMessage)).
+			Send()
+		return
 	}
+
+	c.signalingLogger.Info().
+		Str("roomId", c.roomID).
+		Str("clientId", c.clientID).
+		Str("connectionId", c.ID).
+		Str("type", message.Type).
+		Send()
 }
 
 func (c *connection) errLog() *zerolog.Event {
