@@ -12,25 +12,42 @@ import (
 var Version string
 
 const (
-	defaultLogDir              = "."
-	defaultLogName             = "ayame.jsonl"
-	defaultLogRotateMaxSize    = 200
+	defaultLogDir  = "."
+	defaultLogName = "ayame.jsonl"
+
+	// 200 MB
+	defaultLogRotateMaxSize = 200
+	// 7 ファイル
 	defaultLogRotateMaxBackups = 7
-	defaultLogRotateMaxAge     = 30
-	defaultLogRotateCompress   = false
+	// 30 日
+	defaultLogRotateMaxAge = 30
+	// 圧縮しない
+	defaultLogRotateCompress = false
 
 	defaultSignalingLogName = "signaling.jsonl"
+
+	defaultListenIPv4Address = "0.0.0.0"
+	defaultListenPortNumber  = 3000
 
 	defaultWebSocketReadTimeoutSec  = 90
 	defaultWebSocketPongTimeoutSec  = 60
 	defaultWebSocketPingIntervalSec = 5
 
-	defaultWebhookLogName        = "webhook.jsonl"
 	defaultWebhookRequestTimeout = 5
+	defaultWebhookLogName        = "webhook.jsonl"
 
 	defaultListenPrometheusIPv4Address = "0.0.0.0"
 	defaultListenPrometheusPortNumber  = 4000
 )
+
+var defaultSignalingLogFilters = []string{
+	"register",
+	"offer",
+	"answer",
+	"candidate",
+	"connected",
+	"message",
+}
 
 type Config struct {
 	Debug bool `ini:"debug"`
@@ -114,7 +131,15 @@ func setDefaultsConfig(config *Config) {
 	}
 
 	if config.SignalingLogFilters == nil {
-		config.SignalingLogFilters = []string{"register", "offer", "answer", "candidate", "connected", "message"}
+		config.SignalingLogFilters = defaultSignalingLogFilters
+	}
+
+	if config.ListenIPv4Address == "" {
+		config.ListenIPv4Address = defaultListenIPv4Address
+	}
+
+	if config.ListenPortNumber == 0 {
+		config.ListenPortNumber = defaultListenPortNumber
 	}
 
 	if config.WebSocketReadTimeoutSec == 0 {
@@ -129,12 +154,12 @@ func setDefaultsConfig(config *Config) {
 		config.WebSocketPingIntervalSec = defaultWebSocketPingIntervalSec
 	}
 
-	if config.WebhookLogName == "" {
-		config.WebhookLogName = defaultWebhookLogName
-	}
-
 	if config.WebhookRequestTimeoutSec == 0 {
 		config.WebhookRequestTimeoutSec = defaultWebhookRequestTimeout
+	}
+
+	if config.WebhookLogName == "" {
+		config.WebhookLogName = defaultWebhookLogName
 	}
 
 	if config.ListenPrometheusIPv4Address == "" {
