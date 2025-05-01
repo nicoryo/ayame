@@ -76,6 +76,9 @@ type Config struct {
 	// ping 送信の時間間隔
 	WebSocketPingIntervalSec int32 `ini:"websocket_ping_interval_sec"`
 
+	// シグナリングからコピーする WebSocket の HTTP ヘッダー名
+	CopyWebSocketHeaderNames []string `ini:"copy_websocket_header_names"`
+
 	AuthnWebhookURL      string `ini:"authn_webhook_url"`
 	DisconnectWebhookURL string `ini:"disconnect_webhook_url"`
 

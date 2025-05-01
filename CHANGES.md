@@ -11,6 +11,11 @@
 
 ## develop
 
+- [ADD] シグナリングの HTTP ヘッダー名をウェブフックにコピーする `copy_websocket_header_names` を追加する
+  - @voluntas
+- [ADD] シグナリングから取得した HTTP ヘッダーをウェブフックにコピーする
+  - @voluntas
+
 ## 2025.3.0
 
 - [CHANGE] シグナリングログファイル名のデフォルトを `signaling.log` から `signaling.jsonl` に変更する

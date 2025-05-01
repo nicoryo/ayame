@@ -28,7 +28,7 @@ func (c *connection) disconnectWebhook() error {
 
 	resp, err := c.postRequest(c.config.DisconnectWebhookURL, req)
 	if err != nil {
-		c.errLog().Err(err).Caller().Msg("DiconnectWebhookError")
+		c.errLog().Err(err).Caller().Msg("DisconnectWebhookError")
 		return errDisconnectWebhook
 	}
 	defer resp.Body.Close()
