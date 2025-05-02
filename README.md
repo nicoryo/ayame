@@ -66,7 +66,7 @@ Ayame 仕様と完全互換な STUN/TURN サーバやルーム認証を組み込
 
 Apache License 2.0
 
-```
+```text
 Copyright 2019-2025, Shiguredo Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");

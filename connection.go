@@ -44,6 +44,9 @@ type connection struct {
 	// standalone mode
 	standalone bool
 
+	// シグナリングからコピーした HTTP ヘッダー
+	copyHeaders map[string]string
+
 	metrics *Metrics
 }
 
