@@ -46,6 +46,7 @@ func (c *connection) webhookLog(n string, v interface{}) {
 	c.webhookLogger.Log().
 		Str("roomId", c.roomID).
 		Str("clientId", c.ID).
+		Interface("copyHeaders", c.copyHeaders).
 		Interface(n, v).
 		Send()
 }

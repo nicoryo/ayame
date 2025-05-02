@@ -206,6 +206,8 @@ func (c *Config) PrintConfig() {
 	zlog.Info().Str("listen_ipv4_address", c.ListenIPv4Address).Msg("AyameConf")
 	zlog.Info().Int32("listen_port_number", c.ListenPortNumber).Msg("AyameConf")
 
+	zlog.Info().Strs("copy_websocket_header_names", c.CopyWebSocketHeaderNames).Msg("AyameConf")
+
 	zlog.Info().Str("authn_webhook_url", c.AuthnWebhookURL).Msg("AyameConf")
 	zlog.Info().Str("disconnect_webhook_url", c.DisconnectWebhookURL).Msg("AyameConf")
 

@@ -11,7 +11,9 @@
 
 ## develop
 
-- [ADD] シグナリングに利用する WebSocket の HTTP ヘッダー名をウェブフックにコピーする `copy_websocket_header_names` を追加する
+- [ADD] シグナリングで利用する WebSocket の HTTP ヘッダーをウェブフックにコピーする `copy_websocket_header_names` 設定を追加する
+  - HTTP ヘッダー名は大文字小文字を区別しません
+  - 複数のヘッダー名を指定できます
   - @voluntas
 
 ## 2025.3.0
