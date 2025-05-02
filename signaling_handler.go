@@ -39,6 +39,16 @@ func (s *Server) signalingHandler(c echo.Context) error {
 
 	wsConn.SetReadLimit(readLimit)
 
+	// s.config.CopyWebSocketHeaderNames にマッチするヘッダーを取得して connection.copyHeaders に設定する
+	copyHeaders := make(map[string]string)
+	for _, headerName := range s.config.CopyWebSocketHeaderNames {
+		// 設定ファイルのヘッダー名を http.CanonicalHeaderKey で正規化してから Header.Get で取得する
+		canonicalName := http.CanonicalHeaderKey(headerName)
+		if headerValue := r.Header.Get(canonicalName); headerValue != "" {
+			copyHeaders[canonicalName] = headerValue
+		}
+	}
+
 	connection := connection{
 		// connectionId を設定する
 		ID: getULID(),
@@ -52,7 +62,10 @@ func (s *Server) signalingHandler(c echo.Context) error {
 		signalingLogger: *s.signalingLogger,
 		webhookLogger:   *s.webhookLogger,
 		metrics:         s.Metrics,
+
+		copyHeaders: copyHeaders,
 	}
+
 	// client.conn.SetCloseHandler(client.closeHandler)
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)

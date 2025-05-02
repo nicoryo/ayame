@@ -31,6 +31,11 @@ func (c *connection) postRequest(u string, body interface{}) (*http.Response, er
 	}
 	req.Header.Set("Content-Type", "application/json")
 
+	// シグナリングからコピーした HTTP ヘッダーを設定する
+	for k, v := range c.copyHeaders {
+		req.Header.Set(k, v)
+	}
+
 	timeout := time.Duration(c.config.WebhookRequestTimeoutSec) * time.Second
 
 	client := &http.Client{Timeout: timeout}
@@ -41,6 +46,7 @@ func (c *connection) webhookLog(n string, v interface{}) {
 	c.webhookLogger.Log().
 		Str("roomId", c.roomID).
 		Str("clientId", c.ID).
+		Interface("copyHeaders", c.copyHeaders).
 		Interface(n, v).
 		Send()
 }
