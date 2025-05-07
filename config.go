@@ -58,6 +58,9 @@ type Config struct {
 	LogRotateMaxAge     int    `ini:"log_rotate_max_age"`
 	LogRotateCompress   bool   `ini:"log_rotate_compress"`
 
+	LogMessageKeyName   string `ini:"log_message_key_name"`
+	LogTimestampKeyName string `ini:"log_timestamp_key_name"`
+
 	SignalingLogName    string   `ini:"signaling_log_name"`
 	SignalingLogFilters []string `ini:"signaling_log_filters"`
 

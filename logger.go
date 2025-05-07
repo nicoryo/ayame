@@ -19,6 +19,13 @@ func InitLogger(config *Config) error {
 
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 
+	if config.LogMessageKeyName != "" {
+		zerolog.MessageFieldName = config.LogMessageKeyName
+	}
+	if config.LogTimestampKeyName != "" {
+		zerolog.TimestampFieldName = config.LogTimestampKeyName
+	}
+
 	if config.Debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
