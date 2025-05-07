@@ -11,6 +11,8 @@
 
 ## develop
 
+## 2025.5.0
+
 - [ADD] ログのメッセージキー名とタイムスタンプキー名を指定できるようにする
   - `log_message_key_name` と `log_timestamp_key_name` を追加する
   - @voluntas
