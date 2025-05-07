@@ -11,6 +11,10 @@
 
 ## develop
 
+- [ADD] ログのメッセージキー名とタイムスタンプキー名を指定できるようにする
+  - `log_message_key_name` と `log_timestamp_key_name` を追加する
+  - @voluntas
+
 ## 2025.4.0
 
 - [ADD] シグナリングで利用する WebSocket の HTTP ヘッダーをウェブフックにコピーする `copy_websocket_header_names` 設定を追加する
