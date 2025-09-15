@@ -1,5 +1,6 @@
 # ayame binary
 bin/*
+ayame
 config.ini
 
 # 新しいログ形式
