@@ -44,6 +44,68 @@ OpenAyame は WebRTC Signaling Server Ayame をオープンソースとして公
 
 Ayame を使ってみたい人は [USE.md](docs/USE.md) をお読みください。
 
+## Docker を使ってみる
+
+GitHub Container Registry から Docker イメージを取得して Ayame を実行できます。
+
+### Docker イメージの取得
+
+```bash
+# 最新版を取得
+docker pull ghcr.io/nicoryo/ayame:latest
+
+# 特定のバージョンを取得（例: v2025.5.1）
+docker pull ghcr.io/nicoryo/ayame:v2025.5.1
+```
+
+### Docker コンテナの実行
+
+```bash
+# デフォルト設定で実行
+docker run -p 3000:3000 -p 4000:4000 ghcr.io/nicoryo/ayame:latest
+
+# カスタム設定ファイルを使用して実行
+docker run -p 3000:3000 -p 4000:4000 -v /path/to/your/config.ini:/app/config.ini ghcr.io/nicoryo/ayame:latest
+
+# ログディレクトリをマウントして実行
+docker run -p 3000:3000 -p 4000:4000 -v /path/to/logs:/app/logs ghcr.io/nicoryo/ayame:latest
+```
+
+### Docker Compose を使用した実行
+
+`docker-compose.yml` ファイルを作成:
+
+```yaml
+version: '3.8'
+services:
+  ayame:
+    image: ghcr.io/nicoryo/ayame:latest
+    ports:
+      - "3000:3000"  # WebRTC シグナリング用ポート
+      - "4000:4000"  # Prometheus メトリクス用ポート
+    volumes:
+      - ./config.ini:/app/config.ini  # カスタム設定ファイル（オプション）
+      - ./logs:/app/logs              # ログディレクトリ（オプション）
+    restart: unless-stopped
+```
+
+実行:
+
+```bash
+docker-compose up -d
+```
+
+### 利用可能なポート
+
+- **3000**: WebRTC シグナリング用ポート（デフォルト）
+- **4000**: Prometheus メトリクス用ポート（デフォルト）
+
+設定ファイルでポート番号を変更した場合は、Docker の `-p` オプションも合わせて変更してください。
+
+## 使ってみる
+
+Ayame を使ってみたい人は [USE.md](docs/USE.md) をお読みください。
+
 ## Web SDK を使ってみる
 
 [Ayame Web SDK](https://github.com/OpenAyame/ayame-web-sdk)

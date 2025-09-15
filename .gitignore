@@ -9,3 +9,6 @@ config.ini
 # 古いログ形式
 *.log
 *.log.*
+
+# Go vendor directory (included for Docker builds)
+# vendor/
