@@ -1,5 +1,6 @@
 # ayame binary
 bin/*
+ayame
 config.ini
 
 # 新しいログ形式
@@ -9,3 +10,6 @@ config.ini
 # 古いログ形式
 *.log
 *.log.*
+
+# Go vendor directory (included for Docker builds)
+# vendor/

@@ -1,0 +1,27 @@
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+CHANGES.md
+docs/
+
+# IDE and editor files
+.vscode/
+*.code-workspace
+
+# Build artifacts
+ayame
+bin/
+dist/
+
+# Logs
+*.log
+*.jsonl
+
+# Test files
+*_test.go
+
+# Coverage reports
+coverage.out
